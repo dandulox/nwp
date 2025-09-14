@@ -78,6 +78,7 @@ app.use(cors());
 app.use(express.json());
 
 // Statische Dateien für das Frontend
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '../client/build')));
 
 // Datenbank initialisieren
@@ -431,7 +432,15 @@ app.post('/api/tools/subnet-calculator', (req, res) => {
 
 // Alle anderen Routen an das React-Frontend weiterleiten
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+  // Versuche zuerst das gebaute React-Frontend
+  const buildPath = path.join(__dirname, '../client/build/index.html');
+  const fallbackPath = path.join(__dirname, 'public/index.html');
+  
+  if (require('fs').existsSync(buildPath)) {
+    res.sendFile(buildPath);
+  } else {
+    res.sendFile(fallbackPath);
+  }
 });
 
 app.listen(PORT, () => {
