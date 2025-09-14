@@ -171,7 +171,7 @@ fi
 # Alle Scripts ausführbar machen
 print_status "Setze Ausführungsrechte für alle Scripts..."
 chmod +x *.sh
-chmod +x *.py
+chmod +x *.py 2>/dev/null || true
 
 # Beende eventuell laufende Prozesse
 print_status "Beende eventuell laufende Prozesse..."

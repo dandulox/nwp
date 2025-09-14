@@ -77,6 +77,9 @@ const PORT = process.env.PORT || 80;
 app.use(cors());
 app.use(express.json());
 
+// Statische Dateien für das Frontend
+app.use(express.static(path.join(__dirname, '../client/build')));
+
 // Datenbank initialisieren
 const db = new sqlite3.Database('./netzwerkplaner.db');
 
@@ -424,6 +427,11 @@ app.post('/api/tools/subnet-calculator', (req, res) => {
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
+});
+
+// Alle anderen Routen an das React-Frontend weiterleiten
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
 app.listen(PORT, () => {

@@ -21,7 +21,7 @@ import {
   Database, 
   HardDrive, 
   Layers,
-  Switch
+  Network
 } from 'lucide-react';
 
 const FlowContainer = styled.div`
@@ -39,8 +39,8 @@ const deviceTypes = {
   cluster: { icon: Database, color: '#1abc9c' },
   vm: { icon: Layers, color: '#34495e' },
   nas: { icon: HardDrive, color: '#95a5a6' },
-  switch_managed: { icon: Switch, color: '#16a085' },
-  switch_unmanaged: { icon: Switch, color: '#7f8c8d' }
+  switch_managed: { icon: Network, color: '#16a085' },
+  switch_unmanaged: { icon: Network, color: '#7f8c8d' }
 };
 
 const DeviceNode = ({ data }) => {
