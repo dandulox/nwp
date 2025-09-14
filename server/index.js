@@ -74,7 +74,10 @@ const app = express();
 const PORT = process.env.PORT || 80;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:80', 'http://10.0.20.104:80', 'http://127.0.0.1:80'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Statische Dateien für das Frontend
@@ -443,8 +446,10 @@ app.get('*', (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server läuft auf Port ${PORT}`);
+  console.log(`Lokal: http://localhost:${PORT}`);
+  console.log(`Netzwerk: http://10.0.20.104:${PORT}`);
 });
 
 // Graceful shutdown

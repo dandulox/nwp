@@ -232,10 +232,26 @@ print_success "Alle Abhängigkeiten installiert/aktualisiert!"
 
 # Starte Netzwerkplaner
 print_status "Starte Netzwerkplaner auf Port 80..."
+# IP-Adresse ermitteln
+LOCAL_IP=$(node -e "
+const os = require('os');
+const interfaces = os.networkInterfaces();
+for (const name of Object.keys(interfaces)) {
+  for (const iface of interfaces[name]) {
+    if (iface.family === 'IPv4' && !iface.internal) {
+      console.log(iface.address);
+      process.exit(0);
+    }
+  }
+}
+console.log('localhost');
+")
+
 echo ""
 echo "🌐 Die Anwendung wird gestartet:"
-echo "   - Frontend: http://localhost:80"
-echo "   - Backend API: http://localhost:80/api"
+echo "   - Frontend (lokal): http://localhost:80"
+echo "   - Frontend (Netzwerk): http://$LOCAL_IP:80"
+echo "   - Backend API: http://$LOCAL_IP:80/api"
 echo ""
 echo "⚠️  Hinweis: Port 80 erfordert möglicherweise Administrator-Rechte"
 echo "   Falls Fehler auftreten, versuchen Sie: sudo ./update.sh"
