@@ -83,77 +83,77 @@ const db = new sqlite3.Database('./netzwerkplaner.db');
 // Datenbankschema erstellen
 db.serialize(() => {
   // Projekte
-  db.run(`CREATE TABLE IF NOT EXISTS projects (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    description TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
+  db.run('CREATE TABLE IF NOT EXISTS projects (' +
+    'id TEXT PRIMARY KEY, ' +
+    'name TEXT NOT NULL, ' +
+    'description TEXT, ' +
+    'created_at DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+    'updated_at DATETIME DEFAULT CURRENT_TIMESTAMP' +
+  ')');
 
   // Geräte
-  db.run(`CREATE TABLE IF NOT EXISTS devices (
-    id TEXT PRIMARY KEY,
-    project_id TEXT NOT NULL,
-    name TEXT NOT NULL,
-    type TEXT NOT NULL,
-    x INTEGER DEFAULT 0,
-    y INTEGER DEFAULT 0,
-    ip_address TEXT,
-    mac_address TEXT,
-    vlan_id INTEGER,
-    speed INTEGER DEFAULT 1000,
-    managed BOOLEAN DEFAULT false,
-    properties TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects (id)
-  )`);
+  db.run('CREATE TABLE IF NOT EXISTS devices (' +
+    'id TEXT PRIMARY KEY, ' +
+    'project_id TEXT NOT NULL, ' +
+    'name TEXT NOT NULL, ' +
+    'type TEXT NOT NULL, ' +
+    'x INTEGER DEFAULT 0, ' +
+    'y INTEGER DEFAULT 0, ' +
+    'ip_address TEXT, ' +
+    'mac_address TEXT, ' +
+    'vlan_id INTEGER, ' +
+    'speed INTEGER DEFAULT 1000, ' +
+    'managed BOOLEAN DEFAULT false, ' +
+    'properties TEXT, ' +
+    'created_at DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+    'FOREIGN KEY (project_id) REFERENCES projects (id)' +
+  ')');
 
   // Verbindungen
-  db.run(`CREATE TABLE IF NOT EXISTS connections (
-    id TEXT PRIMARY KEY,
-    project_id TEXT NOT NULL,
-    from_device_id TEXT NOT NULL,
-    to_device_id TEXT NOT NULL,
-    from_port INTEGER,
-    to_port INTEGER,
-    speed INTEGER DEFAULT 1000,
-    vlan_id INTEGER,
-    color TEXT DEFAULT '#3498db',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects (id),
-    FOREIGN KEY (from_device_id) REFERENCES devices (id),
-    FOREIGN KEY (to_device_id) REFERENCES devices (id)
-  )`);
+  db.run('CREATE TABLE IF NOT EXISTS connections (' +
+    'id TEXT PRIMARY KEY, ' +
+    'project_id TEXT NOT NULL, ' +
+    'from_device_id TEXT NOT NULL, ' +
+    'to_device_id TEXT NOT NULL, ' +
+    'from_port INTEGER, ' +
+    'to_port INTEGER, ' +
+    'speed INTEGER DEFAULT 1000, ' +
+    'vlan_id INTEGER, ' +
+    'color TEXT DEFAULT "#3498db", ' +
+    'created_at DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+    'FOREIGN KEY (project_id) REFERENCES projects (id), ' +
+    'FOREIGN KEY (from_device_id) REFERENCES devices (id), ' +
+    'FOREIGN KEY (to_device_id) REFERENCES devices (id)' +
+  ')');
 
   // VLANs
-  db.run(`CREATE TABLE IF NOT EXISTS vlans (
-    id INTEGER PRIMARY KEY,
-    project_id TEXT NOT NULL,
-    name TEXT NOT NULL,
-    vlan_id INTEGER NOT NULL,
-    subnet TEXT NOT NULL,
-    color TEXT DEFAULT '#3498db',
-    description TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects (id)
-  )`);
+  db.run('CREATE TABLE IF NOT EXISTS vlans (' +
+    'id INTEGER PRIMARY KEY, ' +
+    'project_id TEXT NOT NULL, ' +
+    'name TEXT NOT NULL, ' +
+    'vlan_id INTEGER NOT NULL, ' +
+    'subnet TEXT NOT NULL, ' +
+    'color TEXT DEFAULT "#3498db", ' +
+    'description TEXT, ' +
+    'created_at DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+    'FOREIGN KEY (project_id) REFERENCES projects (id)' +
+  ')');
 
   // Subnetze
-  db.run(`CREATE TABLE IF NOT EXISTS subnets (
-    id TEXT PRIMARY KEY,
-    project_id TEXT NOT NULL,
-    name TEXT NOT NULL,
-    network TEXT NOT NULL,
-    subnet_mask TEXT NOT NULL,
-    gateway TEXT,
-    dns_servers TEXT,
-    vlan_id INTEGER,
-    color TEXT DEFAULT '#3498db',
-    description TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects (id)
-  )`);
+  db.run('CREATE TABLE IF NOT EXISTS subnets (' +
+    'id TEXT PRIMARY KEY, ' +
+    'project_id TEXT NOT NULL, ' +
+    'name TEXT NOT NULL, ' +
+    'network TEXT NOT NULL, ' +
+    'subnet_mask TEXT NOT NULL, ' +
+    'gateway TEXT, ' +
+    'dns_servers TEXT, ' +
+    'vlan_id INTEGER, ' +
+    'color TEXT DEFAULT "#3498db", ' +
+    'description TEXT, ' +
+    'created_at DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+    'FOREIGN KEY (project_id) REFERENCES projects (id)' +
+  ')');
 });
 
 // Validierungsschemas
@@ -267,8 +267,7 @@ app.post('/api/projects/:projectId/devices', (req, res) => {
   const id = uuidv4();
   const { name, type, x, y, ip_address, mac_address, vlan_id, speed, managed, properties } = value;
   
-  db.run(`INSERT INTO devices (id, project_id, name, type, x, y, ip_address, mac_address, vlan_id, speed, managed, properties) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+  db.run('INSERT INTO devices (id, project_id, name, type, x, y, ip_address, mac_address, vlan_id, speed, managed, properties) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
     [id, projectId, name, type, x, y, ip_address, mac_address, vlan_id, speed, managed, properties], function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -289,8 +288,7 @@ app.put('/api/devices/:id', (req, res) => {
   
   const { name, type, x, y, ip_address, mac_address, vlan_id, speed, managed, properties } = value;
   
-  db.run(`UPDATE devices SET name = ?, type = ?, x = ?, y = ?, ip_address = ?, mac_address = ?, vlan_id = ?, speed = ?, managed = ?, properties = ?
-          WHERE id = ?`, 
+  db.run('UPDATE devices SET name = ?, type = ?, x = ?, y = ?, ip_address = ?, mac_address = ?, vlan_id = ?, speed = ?, managed = ?, properties = ? WHERE id = ?', 
     [name, type, x, y, ip_address, mac_address, vlan_id, speed, managed, properties, id], function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -337,8 +335,7 @@ app.post('/api/projects/:projectId/connections', (req, res) => {
   const id = uuidv4();
   const { from_device_id, to_device_id, from_port, to_port, speed, vlan_id, color } = value;
   
-  db.run(`INSERT INTO connections (id, project_id, from_device_id, to_device_id, from_port, to_port, speed, vlan_id, color) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+  db.run('INSERT INTO connections (id, project_id, from_device_id, to_device_id, from_port, to_port, speed, vlan_id, color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
     [id, projectId, from_device_id, to_device_id, from_port, to_port, speed, vlan_id, color], function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -372,8 +369,7 @@ app.post('/api/projects/:projectId/vlans', (req, res) => {
   
   const { name, vlan_id, subnet, color, description } = value;
   
-  db.run(`INSERT INTO vlans (project_id, name, vlan_id, subnet, color, description) 
-          VALUES (?, ?, ?, ?, ?, ?)`, 
+  db.run('INSERT INTO vlans (project_id, name, vlan_id, subnet, color, description) VALUES (?, ?, ?, ?, ?, ?)', 
     [projectId, name, vlan_id, subnet, color, description], function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -408,8 +404,7 @@ app.post('/api/projects/:projectId/subnets', (req, res) => {
   const id = uuidv4();
   const { name, network, subnet_mask, gateway, dns_servers, vlan_id, color, description } = value;
   
-  db.run(`INSERT INTO subnets (id, project_id, name, network, subnet_mask, gateway, dns_servers, vlan_id, color, description) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+  db.run('INSERT INTO subnets (id, project_id, name, network, subnet_mask, gateway, dns_servers, vlan_id, color, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
     [id, projectId, name, network, subnet_mask, gateway, dns_servers, vlan_id, color, description], function(err) {
     if (err) {
       res.status(500).json({ error: err.message });

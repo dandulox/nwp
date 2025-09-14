@@ -260,13 +260,13 @@ const db = new sqlite3.Database('./netzwerkplaner.db');
 // Datenbankschema erstellen
 db.serialize(() => {
   // Projekte
-  db.run(\`CREATE TABLE IF NOT EXISTS projects (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    description TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )\`);
+  db.run('CREATE TABLE IF NOT EXISTS projects (' +
+    'id TEXT PRIMARY KEY, ' +
+    'name TEXT NOT NULL, ' +
+    'description TEXT, ' +
+    'created_at DATETIME DEFAULT CURRENT_TIMESTAMP, ' +
+    'updated_at DATETIME DEFAULT CURRENT_TIMESTAMP' +
+  ')');
 
   // Geräte
   db.run(\`CREATE TABLE IF NOT EXISTS devices (
