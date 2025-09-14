@@ -7,6 +7,69 @@ const { v4: uuidv4 } = require('uuid');
 // const ipCidr = require('ip-cidr');
 const Joi = require('joi');
 
+// Einfache Subnet-Berechnung ohne externe Abhängigkeiten
+function calculateSubnet(network, prefixLength) {
+  try {
+    const [ip, mask] = network.split('/');
+    const prefix = parseInt(mask || prefixLength);
+    
+    if (prefix < 0 || prefix > 32) {
+      throw new Error('Ungültige Präfix-Länge');
+    }
+    
+    const ipParts = ip.split('.').map(Number);
+    if (ipParts.length !== 4 || ipParts.some(part => part < 0 || part > 255)) {
+      throw new Error('Ungültige IP-Adresse');
+    }
+    
+    const hostBits = 32 - prefix;
+    const hostCount = Math.pow(2, hostBits) - 2; // -2 für Netzwerk und Broadcast
+    
+    // Netzwerk-Adresse berechnen
+    const networkMask = (0xFFFFFFFF << (32 - prefix)) >>> 0;
+    const networkParts = [
+      (ipParts[0] & (networkMask >>> 24)) >>> 0,
+      (ipParts[1] & (networkMask >>> 16)) & 0xFF,
+      (ipParts[2] & (networkMask >>> 8)) & 0xFF,
+      (ipParts[3] & networkMask) & 0xFF
+    ];
+    
+    // Broadcast-Adresse berechnen
+    const broadcastParts = [
+      networkParts[0] | ((~networkMask >>> 24) & 0xFF),
+      networkParts[1] | ((~networkMask >>> 16) & 0xFF),
+      networkParts[2] | ((~networkMask >>> 8) & 0xFF),
+      networkParts[3] | (~networkMask & 0xFF)
+    ];
+    
+    // Erste und letzte Host-Adresse
+    const firstHost = [...networkParts];
+    firstHost[3] = (firstHost[3] + 1) % 256;
+    
+    const lastHost = [...broadcastParts];
+    lastHost[3] = (lastHost[3] - 1 + 256) % 256;
+    
+    // Subnetzmaske
+    const subnetMask = [
+      (networkMask >>> 24) & 0xFF,
+      (networkMask >>> 16) & 0xFF,
+      (networkMask >>> 8) & 0xFF,
+      networkMask & 0xFF
+    ];
+    
+    return {
+      network: networkParts.join('.'),
+      broadcast: broadcastParts.join('.'),
+      firstHost: firstHost.join('.'),
+      lastHost: lastHost.join('.'),
+      hostCount: hostCount,
+      subnetMask: subnetMask.join('.')
+    };
+  } catch (error) {
+    throw new Error('Ungültiges Netzwerk: ' + error.message);
+  }
+}
+
 const app = express();
 const PORT = process.env.PORT || 80;
 
@@ -361,19 +424,10 @@ app.post('/api/tools/subnet-calculator', (req, res) => {
   const { network, prefixLength } = req.body;
   
   try {
-    const cidr = new ipCidr(`${network}/${prefixLength}`);
-    const subnets = cidr.toArray();
-    
-    res.json({
-      network: cidr.network,
-      broadcast: cidr.broadcast,
-      firstHost: cidr.firstHost,
-      lastHost: cidr.lastHost,
-      hostCount: cidr.size,
-      subnetMask: cidr.subnetMask
-    });
+    const result = calculateSubnet(network, prefixLength);
+    res.json(result);
   } catch (error) {
-    res.status(400).json({ error: 'Ungültiges Netzwerk' });
+    res.status(400).json({ error: error.message });
   }
 });
 
