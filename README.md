@@ -231,6 +231,34 @@ sudo ./update.sh  # Linux/macOS
 # Als Administrator ausführen in Windows
 ```
 
+**Abhängigkeiten-Probleme:**
+```bash
+# Automatische Reparatur mit update.sh
+./update.sh
+
+# Oder manuell:
+rm -rf node_modules server/node_modules client/node_modules
+rm -f package-lock.json server/package-lock.json client/package-lock.json
+npm cache clean --force
+npm install && cd server && npm install && cd ../client && npm install
+```
+
+**React-Flow Fehler:**
+```bash
+# React-Flow Version-Problem beheben
+cd client
+npm uninstall react-flow react-flow-renderer
+npm install reactflow@^11.10.4
+```
+
+**ip-cidr ES Module Fehler:**
+```bash
+# ip-cidr Version downgraden
+cd server
+npm uninstall ip-cidr
+npm install ip-cidr@^3.1.1
+```
+
 **Datenbank-Fehler:**
 ```bash
 # Datenbank zurücksetzen
@@ -238,10 +266,11 @@ rm server/netzwerkplaner.db
 npm run dev
 ```
 
-**Abhängigkeiten-Problem:**
+**react-scripts nicht gefunden:**
 ```bash
-# Node-Module neu installieren
-rm -rf node_modules
+# Client-Abhängigkeiten neu installieren
+cd client
+rm -rf node_modules package-lock.json
 npm install
 ```
 

@@ -112,6 +112,22 @@ pkill -f "react-scripts" 2>/dev/null || true
 # Kurz warten
 sleep 2
 
+# Node-Module löschen (für saubere Installation)
+print_status "Lösche node_modules für saubere Installation..."
+rm -rf node_modules 2>/dev/null || true
+rm -rf server/node_modules 2>/dev/null || true
+rm -rf client/node_modules 2>/dev/null || true
+
+# Package-lock Dateien löschen
+print_status "Lösche package-lock Dateien..."
+rm -f package-lock.json 2>/dev/null || true
+rm -f server/package-lock.json 2>/dev/null || true
+rm -f client/package-lock.json 2>/dev/null || true
+
+# npm Cache leeren
+print_status "Leere npm Cache..."
+npm cache clean --force 2>/dev/null || true
+
 # Root-Abhängigkeiten installieren/aktualisieren
 print_status "Installiere/aktualisiere Root-Abhängigkeiten..."
 npm install
