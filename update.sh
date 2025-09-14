@@ -61,8 +61,11 @@ else
     print_status "Git-Repository gefunden. Aktualisiere..."
     
     # Alle lokalen Änderungen verwerfen
-    print_status "Verwerfe lokale Änderungen..."
+    print_status "Verwerfe alle lokalen Änderungen..."
     git fetch origin
+    git reset --hard origin/main
+    git clean -fd
+    git checkout main
     git reset --hard origin/main
     
     # Repository aktualisieren
@@ -155,6 +158,8 @@ fi
 
 # Server index.js korrigieren (immer überschreiben für korrekte Version)
 print_status "Korrigiere server/index.js..."
+# Kopiere die korrekte server/index.js Datei
+cp server/index.js server/index.js.backup 2>/dev/null || true
 cat > server/index.js << 'EOF'
 const express = require('express');
 const cors = require('cors');
