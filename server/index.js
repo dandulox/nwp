@@ -3,7 +3,8 @@ const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const ipCidr = require('ip-cidr');
+// ip-cidr ist jetzt ein ES Module, verwenden wir eine alternative Implementierung
+// const ipCidr = require('ip-cidr');
 const Joi = require('joi');
 
 const app = express();

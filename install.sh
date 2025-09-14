@@ -54,6 +54,56 @@ echo "  - Benutzer: $(whoami)"
 echo "  - Arbeitsverzeichnis: $(pwd)"
 echo ""
 
+# Repository URL
+REPO_URL="https://github.com/dandulox/nwp.git"
+NWP_DIR="nwp"
+
+# Prüfen ob wir bereits im nwp Verzeichnis sind
+if [ -f "package.json" ] && [ -d "server" ] && [ -d "client" ]; then
+    print_success "Bereits im Netzwerkplaner-Verzeichnis"
+    NWP_DIR="."
+else
+    # Prüfen ob nwp Verzeichnis bereits existiert
+    if [ -d "$NWP_DIR" ]; then
+        print_status "nwp Verzeichnis existiert bereits. Wechsle hinein..."
+        cd "$NWP_DIR"
+    else
+        print_status "Klone das Netzwerkplaner Repository..."
+        
+        # Git installieren falls nicht vorhanden
+        if ! command -v git &> /dev/null; then
+            print_status "Installiere Git..."
+            if command -v apt-get &> /dev/null; then
+                sudo apt-get update && sudo apt-get install -y git
+            elif command -v yum &> /dev/null; then
+                sudo yum install -y git
+            elif command -v brew &> /dev/null; then
+                brew install git
+            else
+                print_error "Git ist nicht installiert und kann nicht automatisch installiert werden."
+                exit 1
+            fi
+        fi
+        
+        # Repository klonen
+        if git clone "$REPO_URL" "$NWP_DIR"; then
+            print_success "Repository erfolgreich geklont"
+            cd "$NWP_DIR"
+        else
+            print_error "Fehler beim Klonen des Repositories"
+            exit 1
+        fi
+    fi
+fi
+
+# Prüfen ob wir jetzt im richtigen Verzeichnis sind
+if [ ! -f "package.json" ]; then
+    print_error "package.json nicht gefunden. Ist dies ein gültiges Netzwerkplaner-Repository?"
+    exit 1
+fi
+
+print_success "Arbeite im Verzeichnis: $(pwd)"
+
 # Funktion zum automatischen Installieren von Paketen
 install_package() {
     local package=$1
@@ -97,18 +147,6 @@ install_package() {
         print_success "$package_name ist bereits installiert"
     fi
 }
-
-# Prüfen ob Git installiert ist
-if ! command -v git &> /dev/null; then
-    print_error "Git ist nicht installiert. Versuche automatische Installation..."
-    install_package "git" "git"
-    if ! command -v git &> /dev/null; then
-        print_error "Git konnte nicht installiert werden. Bitte installieren Sie Git manuell."
-        exit 1
-    fi
-fi
-
-print_success "Git Version: $(git --version)"
 
 # Prüfen ob Node.js installiert ist
 if ! command -v node &> /dev/null; then
@@ -187,111 +225,10 @@ fi
 
 print_success "npm Version: $(npm -v)"
 
-# Prüfen ob Python installiert ist (für native Module)
-if ! command -v python3 &> /dev/null && ! command -v python &> /dev/null; then
-    print_warning "Python ist nicht installiert. Einige native Module könnten Probleme verursachen."
-    print_status "Versuche automatische Installation von Python..."
-    
-    # Ubuntu/Debian
-    if command -v apt-get &> /dev/null; then
-        print_status "Installiere Python mit apt-get..."
-        if sudo apt-get update && sudo apt-get install -y python3 python3-pip python3-dev; then
-            print_success "Python erfolgreich installiert"
-        else
-            print_warning "Python konnte nicht installiert werden"
-        fi
-    # CentOS/RHEL
-    elif command -v yum &> /dev/null; then
-        print_status "Installiere Python mit yum..."
-        if sudo yum install -y python3 python3-pip python3-devel; then
-            print_success "Python erfolgreich installiert"
-        else
-            print_warning "Python konnte nicht installiert werden"
-        fi
-    # macOS
-    elif command -v brew &> /dev/null; then
-        print_status "Installiere Python mit brew..."
-        if brew install python3; then
-            print_success "Python erfolgreich installiert"
-        else
-            print_warning "Python konnte nicht installiert werden"
-        fi
-    else
-        print_warning "Kein Paketmanager gefunden. Python wird nicht installiert."
-    fi
-else
-    if command -v python3 &> /dev/null; then
-        print_success "Python3 Version: $(python3 --version)"
-    else
-        print_success "Python Version: $(python --version)"
-    fi
-fi
-
-# Prüfen ob Build-Tools installiert sind
-print_status "Prüfe Build-Tools..."
-
-# Prüfen ob make installiert ist
-if ! command -v make &> /dev/null; then
-    print_warning "make ist nicht installiert. Build-Tools werden empfohlen."
-    print_status "Versuche automatische Installation von Build-Tools..."
-    
-    # Ubuntu/Debian
-    if command -v apt-get &> /dev/null; then
-        print_status "Installiere build-essential mit apt-get..."
-        if sudo apt-get update && sudo apt-get install -y build-essential; then
-            print_success "Build-Tools erfolgreich installiert"
-        else
-            print_warning "Build-Tools konnten nicht installiert werden"
-        fi
-    # CentOS/RHEL
-    elif command -v yum &> /dev/null; then
-        print_status "Installiere Development Tools mit yum..."
-        if sudo yum groupinstall -y 'Development Tools'; then
-            print_success "Build-Tools erfolgreich installiert"
-        else
-            print_warning "Build-Tools konnten nicht installiert werden"
-        fi
-    # macOS
-    elif command -v brew &> /dev/null; then
-        print_status "Installiere Xcode Command Line Tools..."
-        if xcode-select --install 2>/dev/null; then
-            print_success "Xcode Command Line Tools installiert"
-        else
-            print_warning "Xcode Command Line Tools konnten nicht installiert werden"
-        fi
-    else
-        print_warning "Kein Paketmanager gefunden. Build-Tools werden nicht installiert."
-    fi
-fi
-
-# Prüfen ob gcc installiert ist
-if ! command -v gcc &> /dev/null; then
-    print_warning "gcc ist nicht installiert. Build-Tools werden empfohlen."
-fi
-
-# Prüfen ob curl installiert ist
-if ! command -v curl &> /dev/null; then
-    print_warning "curl ist nicht installiert. Wird für Downloads benötigt."
-    install_package "curl" "curl"
-fi
-
-# Prüfen ob wget installiert ist
-if ! command -v wget &> /dev/null; then
-    print_warning "wget ist nicht installiert. Alternative zu curl."
-    install_package "wget" "wget"
-fi
-
-# Prüfen ob unzip installiert ist
-if ! command -v unzip &> /dev/null; then
-    print_warning "unzip ist nicht installiert. Wird für Archive benötigt."
-    install_package "unzip" "unzip"
-fi
-
 # Alle notwendigen Pakete auf einmal installieren (Ubuntu/Debian)
 if command -v apt-get &> /dev/null; then
     print_status "Installiere alle notwendigen Pakete auf einmal..."
     if sudo apt-get update && sudo apt-get install -y \
-        git \
         curl \
         wget \
         unzip \
