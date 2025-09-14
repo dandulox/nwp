@@ -48,13 +48,40 @@ Ein umfassender visueller Netzwerkplaner mit Subnetting und VLAN-Management-Funk
 ### Voraussetzungen
 - Node.js (Version 16 oder höher)
 - npm oder yarn
+- Git
 
 ### Schnellstart
 
+#### Automatisches Update & Start (Empfohlen)
+
+**Linux/macOS:**
+```bash
+./update.sh
+```
+
+**Windows (Command Prompt):**
+```cmd
+update.bat
+```
+
+**Windows (PowerShell):**
+```powershell
+.\update.ps1
+```
+
+Das Update-Script:
+- Klont/aktualisiert das Repository automatisch
+- Setzt automatisch Ausführungsrechte für alle Scripts
+- Installiert alle Abhängigkeiten
+- Startet die Anwendung auf Port 80
+- Überschreibt lokale Änderungen automatisch
+
+#### Manuelle Installation
+
 1. **Repository klonen**
    ```bash
-   git clone <repository-url>
-   cd netzwerkplaner
+   git clone https://github.com/dandulox/nwp.git
+   cd nwp
    ```
 
 2. **Abhängigkeiten installieren**
@@ -68,24 +95,22 @@ Ein umfassender visueller Netzwerkplaner mit Subnetting und VLAN-Management-Funk
    ```
 
 4. **Browser öffnen**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
+   - Frontend: http://localhost:80
+   - Backend API: http://localhost:80/api
 
-### Manuelle Installation
+### Port-Konfiguration
 
-**Backend installieren:**
+Die Anwendung läuft standardmäßig auf **Port 80**. Falls Sie einen anderen Port verwenden möchten:
+
 ```bash
-cd server
-npm install
-npm run dev
+# Port 3000 verwenden
+PORT=3000 npm run dev
+
+# Port 8080 verwenden  
+PORT=8080 npm run dev
 ```
 
-**Frontend installieren:**
-```bash
-cd client
-npm install
-npm start
-```
+**Hinweis:** Port 80 erfordert möglicherweise Administrator-Rechte. Falls Probleme auftreten, verwenden Sie einen anderen Port oder führen Sie das Script als Administrator aus.
 
 ## 📖 Verwendung
 
@@ -139,8 +164,8 @@ npm start
 
 ### Umgebungsvariablen
 ```bash
-# Server-Port (Standard: 5000)
-PORT=5000
+# Server-Port (Standard: 80)
+PORT=80
 
 # Datenbank-Pfad (Standard: ./netzwerkplaner.db)
 DB_PATH=./netzwerkplaner.db
@@ -200,6 +225,10 @@ Die Farben können in den CSS-Dateien angepasst werden:
 ```bash
 # Anderen Port verwenden
 PORT=3001 npm run dev
+
+# Oder Administrator-Rechte verwenden für Port 80
+sudo ./update.sh  # Linux/macOS
+# Als Administrator ausführen in Windows
 ```
 
 **Datenbank-Fehler:**
