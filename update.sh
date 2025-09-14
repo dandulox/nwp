@@ -105,6 +105,71 @@ else
         sed -i 's/"react-flow": "[^"]*",/"reactflow": "^11.10.4",/' client/package.json
     fi
     
+    # Client public Ordner erstellen falls nicht vorhanden
+    if [ ! -d "client/public" ]; then
+        print_status "Erstelle client/public Ordner..."
+        mkdir -p client/public
+    fi
+    
+    # Client index.html erstellen falls nicht vorhanden
+    if [ ! -f "client/public/index.html" ]; then
+        print_status "Erstelle client/public/index.html..."
+        cat > client/public/index.html << 'HTML_EOF'
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Netzwerkplaner - Visueller Netzwerkplaner mit Subnetting und VLAN-Management"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>Netzwerkplaner</title>
+  </head>
+  <body>
+    <noscript>Sie müssen JavaScript aktivieren, um diese App zu verwenden.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
+HTML_EOF
+    fi
+    
+    # Client manifest.json erstellen falls nicht vorhanden
+    if [ ! -f "client/public/manifest.json" ]; then
+        print_status "Erstelle client/public/manifest.json..."
+        cat > client/public/manifest.json << 'MANIFEST_EOF'
+{
+  "short_name": "Netzwerkplaner",
+  "name": "Netzwerkplaner - Visueller Netzwerkplaner",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
+MANIFEST_EOF
+    fi
+    
+    # Client robots.txt erstellen falls nicht vorhanden
+    if [ ! -f "client/public/robots.txt" ]; then
+        print_status "Erstelle client/public/robots.txt..."
+        cat > client/public/robots.txt << 'ROBOTS_EOF'
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Disallow:
+ROBOTS_EOF
+    fi
+    
     # Server index.js korrigieren (ip-cidr entfernen)
     if grep -q "require('ip-cidr')" server/index.js; then
         print_status "Korrigiere server/index.js..."
